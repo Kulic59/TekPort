@@ -1,0 +1,213 @@
+файл port1008.pcap
+протокол соединения с TDS3012(11) maprpc
+пакет 1 соединение с sunrpc порт 111
+пакет 2 ответ о подключении к sunrpc
+пакет 3 непонятно
+
+пакет 4 запрос номер порта для соединения по Tek RPC
+80 00 00 38
+   XID       MessageType RPC_Version  RpcProgram
+00 00 3f 31 00 00 00 00 00 00 00 02 00 01 86 a0
+Version     Procedure    Credentials
+00 00 00 02 00 00 00 03 00 00 00 00 00 00 00 00
+Verifier                ProcCode    ProcVersion
+00 00 00 00 00 00 00 00 00 06 07 af 00 00 00 01
+Protocol    Port
+00 00 00 06 00 00 00 00
+
+пакет 5 ответ: порт 1008 = $3f0
+80 00 00 1c
+   XID       MessageType
+00 00 3f 31 00 00 00 01 00 00 00 00 00 00 00 00
+                              Port number
+00 00 00 00 00 00 00 00 00 00 03 f0
+
+пакет 6 запрос о закрытии соединения sunrpc
+пакет 8 непонятно
+пакет 15 подтверждение закрытия sunrpc
+пакет 16 отсоединение
+
+пакет 7 запрос соединения с портом 1008
+пакет 9 подтверждение соединения
+пакет 10 непонятно
+
+пакет 11 отправка inst0 по Tek RPC
+80 00 00 40
+   XID       MessageType RPC_Version  RpcProgram
+00 00 6d 1c 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0a 00 00 00 00 00 00 00 00
+Verifier                ProcCode    ProcVersion
+00 00 00 00 00 00 00 00 c0 a8 03 34 00 00 00 00
+Protocol    DataL
+00 00 00 00 00 00 00 05 inst0#0#0#0
+
+пакет 12 подтверждение приема
+80 00 00 28
+   XID      MessageType ReplyState
+00 00 6в 1с 00 00 00 01 00 00 00 00 00 00 00 00
+                                    ScopeCode
+00 00 00 00 00 00 00 00 00 00 00 00 de af 00 00
+2 ???       3 ???
+00 00 03 ed 00 00 10 00
+
+пакет 13 отправка *CLS
+80 00 00 40
+   XID      MessageType RPC_Version  RpcProgram
+00 00 36 78 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0b 00 00 00 00 00 00 00 00
+Verifier                ScopeCode   ProcCode
+00 00 00 00 00 00 00 00 de af 00 00 00 00 07 d0
+ProcVersion Protocol    DataL
+00 00 00 00 00 00 00 08 00 00 00 04  *CLS
+
+пакет 14 подтверждение приема
+80 00 00 20
+   XID      MessageType ReplyState
+00 00 36 78 00 00 00 01 00 00 00 00 00 00 00 00
+                                    DataL
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 04
+
+пакет 25 отправка *ESR?
+80 00 00 44
+   XID       MessageType RPC_Version  RpcProgram
+00 00 7e 6d 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0b 00 00 00 00 00 00 00 00
+Verifier                ScopeCode   ProcCode
+00 00 00 00 00 00 00 00 de af 00 00 00 00 07 d0
+ProcVersion Protocol    DataL
+00 00 00 00 00 00 00 00 00 00 00 06  *ESR?<EOL> a5 71
+
+пакет 26 подтверждение приема
+80 00 00 20
+   XID      MessageType ReplyState
+00 00 7e 6d 00 00 00 01 00 00 00 00 00 00 00 00
+                                    DataL
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 06
+
+пакет 27 запрос ответа
+80 00 00 40
+   XID       MessageType RPC_Version  RpcProgram
+00 00 34 cd 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0c 00 00 00 00 00 00 00 00
+Verifier                ScopeCode   4 ???
+00 00 00 00 00 00 00 00 de af 00 00 00 00 27 10
+ ProcCode    ProcVersion Protocol    DataCode
+00 00 07 d0 00 00 00 00 00 00 00 80 00 00 00 0a
+
+пакет 28 получение ответа 0
+80 00 00 28
+   XID      MessageType ReplyState
+00 00 34 cd 00 00 00 01 00 00 00 00 00 00 00 00
+                                    5 ???
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 04
+DataL
+00 00 00 02 30 0a 00 00
+
+
+
+протокол обмена с TDS3012(11) порт 1008
+
+пакет 7 запрос *ESR?
+код   длина (похоже, что обязана быть кратна 4)
+80 00 00 44
+   XID       MessageType RPC_Version  RpcProgram
+00 00 5e 0a 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0b 00 00 00 00 00 00 00 00
+Verifier                1 ???       ProcCode
+00 00 00 00 00 00 00 00 de af 00 00 00 00 07 d0
+ProcVersion Protocol    DataL
+00 00 00 00 00 00 00 00 00 00 00 06 *ESR?0a 48 01
+
+пакет 8 подтверждение получения
+80 00 00 20
+   XID      MessageType ReplyState
+00 00 5e 0a 00 00 00 01 00 00 00 00 00 00 00 00
+                                    DataL
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 06
+
+пакет 9 ожидание ответа?
+80 00 00 40
+   XID       MessageType RPC_Version  RpcProgram
+00 00 58 57 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0c 00 00 00 00 00 00 00 00
+Verifier                1 ???       4 ???
+00 00 00 00 00 00 00 00 de af 00 00 00 00 27 10
+ ProcCode   ProcVersion Protocol    DataCode
+00 00 07 d0 00 00 00 00 00 00 00 80 00 00 00 0a
+
+пакет 10 ответ прибора  0
+80 00 00 28
+   XID      MessageType ReplyState
+00 00 58 57 00 00 00 01 00 00 00 00 00 00 00 00
+                                    5 ???
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 04
+DataL
+00 00 00 02 30 0a 00 00
+
+протокол обмена с DPO2024(35) порт 722
+
+пакет 11 отправка inst0 по Tek RPC
+80 00 00 40
+   XID       MessageType RPC_Version  RpcProgram
+00 00 15 cf 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0a 00 00 00 00 00 00 00 00
+Verifier                ProcCode    ProcVersion
+00 00 00 00 00 00 00 00 c0 a8 03 34 00 00 00 00
+Protocol    DataL
+00 00 00 00 00 00 00 05 inst0#0#0#0
+
+пакет 15 подтверждение приема
+80 00 00 28
+   XID      MessageType ReplyState
+00 00 15 сf 00 00 00 01 00 00 00 00 00 00 00 00
+                                    ScopeCode
+00 00 00 00 00 00 00 00 00 00 00 00 ba be 00 00
+2 ???       3 ???
+00 00 02 d5 00 00 10 00
+
+пакет 30 запрос *ESR?
+код   длина 
+80 00 00 44
+   XID       MessageType RPC_Version  RpcProgram
+00 00 5f cc 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0b 00 00 00 00 00 00 00 00
+Verifier                ScopeCode       ProcCode
+00 00 00 00 00 00 00 00 ba be 00 00 00 00 07 d0
+ProcVersion Protocol    DataL             garbage
+00 00 00 00 00 00 00 08 00 00 00 05 *ESR? 71 a5 71
+
+пакет 31 подтверждение получения
+80 00 00 20
+   XID      MessageType ReplyState
+00 00 5f cc 00 00 00 01 00 00 00 00 00 00 00 00
+                                    DataL
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 05
+
+пакет 32 ожидание ответа?
+80 00 00 40
+   XID       MessageType RPC_Version  RpcProgram
+00 00 71 0a 00 00 00 00 00 00 00 02 00 06 07 af
+Version     Procedure    Credentials
+00 00 00 01 00 00 00 0c 00 00 00 00 00 00 00 00
+Verifier                ScopeCode      4 ???
+00 00 00 00 00 00 00 00 ba be 00 00 00 01 86 a0
+ ProcCode   ProcVersion Protocol    DataCode
+00 00 07 d0 00 00 00 00 00 00 00 00 00 00 00 0a
+
+пакет 34 ответ прибора  0
+80 00 00 28
+   XID      MessageType ReplyState
+00 00 71 0a 00 00 00 01 00 00 00 00 00 00 00 00
+                                    5 ???
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 04
+DataL             garbage
+00 00 00 02 30 0a 00 00
+
