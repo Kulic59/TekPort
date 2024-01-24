@@ -3,7 +3,7 @@ unit UTekRPC;
 interface
 uses
   Windows, SysUtils, Classes, blcksock;
-  
+
 const
   HeadVersion = $80;
   EOL=$a;
@@ -13,6 +13,11 @@ const
   UScopeCode: DWORD = $afde;
 
 type
+  ERpcError = class(Exception)
+  end;
+  EZerroData = class(ERpcError)
+  end;
+
   TAckType = (ConnectPort, SendData);
   // Followed to sunrpc in RPC.txt file
   TMessageType = (mtCALL, mtREPLY);
@@ -67,6 +72,38 @@ type
     Quest5: DWORD;
     DataL:  DWORD;
   end;
+  { TReplyQuery }
+  TReplyQuery = class
+  private
+    Data: TReplyQueryData;
+    fAnswer: string;
+    function GetLAnswer: integer;
+  public
+    constructor Create;
+    procedure Get(TCP: TTCPBlockSocket);
+
+    property Answer: string read fAnswer;
+    property LAnswer: integer read GetLAnswer;
+  end;
+
+  { TReplyInvalidData }
+  TReplyInvalidData = packed record
+    XID: DWORD;
+    MessageType: DWORD;  // 0
+    ReplyState: DWORD;  // 0- accepted 1= executed
+    Reserved: array[0..2] of DWORD;
+    ErrorCode: DWORD;  // swap4($f)
+    Reserved1: array[0..1] of DWORD;
+  end;
+  { TReplyInvalid }
+  TReplyInvalid = class
+  private
+    Data: TReplyInvalidData;
+  public
+    constructor Create;
+    procedure Get(TCP: TTCPBlockSocket);
+  end;
+
 
   { TReplySendData }
   TReplySendData = packed record  // 32 байта
@@ -153,28 +190,12 @@ type
     DataL:  DWORD;
   end;
 
-  ERpcError = class(Exception)
-  end;
-
   TGetInst0 = class(TObject)
   private
     Data: TGetInst0Data;
   public
     constructor Create;
     procedure Get( TCP: TTCPBlockSocket);
-  end;
-
-  TReplyQuery = class
-  private
-    Data: TReplyQueryData;
-    fAnswer: string;
-    function GetLAnswer: integer;
-  public
-    constructor Create;
-    procedure Get(TCP: TTCPBlockSocket);
-
-    property Answer: string read fAnswer;
-    property LAnswer: integer read GetLAnswer;
   end;
 
   TReplySend = class
@@ -309,6 +330,8 @@ var
 begin
   XStream.Clear;
   TCP.RecvStreamRaw(XStream, 1000);
+  if XStream.Size=0 then
+    raise EZerroData.Create('Receive 0 byte data');
   XStream.Seek(0, soFromBeginning);
   XStream.Read(MainHeader, SizeOf(MainHeader));
   if MainHeader.HeaderVersion<>HeadVersion then
@@ -334,6 +357,37 @@ end;
 function TReplyQuery.GetLAnswer: integer;
 begin
   result := Data.DataL;
+end;
+
+{ TReplyInvalid }
+
+constructor TReplyInvalid.Create;
+begin
+  inherited;
+end;
+
+procedure TReplyInvalid.Get(TCP: TTCPBlockSocket);
+begin
+  XStream.Clear;
+  TCP.RecvStreamRaw(XStream, 1000);
+  if XStream.Size=0 then
+    raise EZerroData.Create('Receive 0 byte data');
+  XStream.Seek(0, soFromBeginning);
+  XStream.Read(MainHeader, SizeOf(MainHeader));
+  if MainHeader.HeaderVersion<>HeadVersion then
+    raise ERpcError.Create('Invalid Header');
+  XStream.Read(Data, SizeOf(Data));
+  Data.MessageType := swap4(Data.MessageType);
+  Data.ReplyState := swap4(Data.ReplyState);
+  Data.ErrorCode := swap4(Data.ErrorCode);
+  if Data.XID<>LastXID then
+    raise ERpcError.Create('Invalid XID');
+  if Data.MessageType<>1 then
+    raise ERpcError.Create('Invalid message type');
+  if Data.ReplyState<>0 then
+    raise ERpcError.Create('RPC call not accepted');
+  if Data.ErrorCode = $f then
+    raise ERpcError.Create('No data for reply');
 end;
 
   { TReplySend }
@@ -552,10 +606,6 @@ begin
   TCP.SendStreamRaw(XStream);
   XStream.Clear;
 end;
-
-
-
-
 
 
 initialization

@@ -117,6 +117,7 @@ procedure TfmTekClient.bnReadClick(Sender: TObject);
 var
   SendQuery: TSendQuery;
   ReplyQuery: TReplyQuery;
+  ReplyInvalid: TReplyInvalid;
 begin
   SendQuery := TSendQuery.Create($10270000,$80000000);
   try
@@ -125,11 +126,18 @@ begin
     SendQuery.Free;
   end;
   ReplyQuery := TReplyQuery.Create;
+  ReplyInvalid := TReplyInvalid.Create;
   try
-    ReplyQuery.Get(ClientSocket);
+    try
+      ReplyQuery.Get(ClientSocket);
+    except
+      On EZerroData do
+        ReplyInvalid.Get(ClientSocket);
+    end;
     memLog.Lines.Add('GetS='+ReplyQuery.Answer);
   finally
     ReplyQuery.Free;
+    ReplyInvalid.Free;
   end;
 end;
 
